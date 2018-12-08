@@ -6,6 +6,7 @@ class Node:
         self._name = name
         self._neighbors = neighbors
         self._paths = []
+        self._liveNeighbors = dict([[n,True] for n in neighbors])
 
     @property
     def name(self):
@@ -30,6 +31,18 @@ class Node:
     @paths.setter
     def paths(self, value):
         self._paths = value
+    
+    @property
+    def liveNeighbors(self):
+        return self._liveNeighbors
+
+    @liveNeighbors.setter
+    def liveNeighbors(self, value):
+        neighbors, liveness = value
+        assert len(neighbors) == len(liveness)
+        for idx, elem in enumerate( neighbors ):
+            self._liveNeighbors[elem] = liveness[ idx ]
+
 
 
 # Initialize reachable paths for each node
@@ -86,19 +99,21 @@ def best(path_y, path_w, neighbor):
 
 
 # Print the network
-def print_network(network):
+def print_network(network, liveNodes):
+    print('\nlive nodes: {}'.format(liveNodes))
     print("\nThe list of nodes, their neighbors and theirs reachable paths:")
     for node in network:
-        print("\nnode name: {}".format(node._name))
-        print("node neighbors: {}".format(node._neighbors))
-        print("node paths: {}".format(node._paths))
-
+            print("\nnode name: {}".format(node._name))
+            print("node neighbors: {}".format(node._neighbors))
+            print("node paths: {}".format(node._paths))
+            print("live neighbors: {}".format(node._liveNeighbors))
 
 
 if __name__ == '__main__':
 
     num_nodes = None
     networkInit = False
+    liveNodes = None
 
     # user input for graph definition
     while True:
@@ -125,7 +140,8 @@ if __name__ == '__main__':
                         network = update(item, network[int(i)], network)
 
             networkInit = True
-            print "Network Initialized\n\n"
+            liveNodes = [True]*num_nodes
+            print("Network Initialized\n\n")
      
         if networkInit:
             while True:
@@ -136,28 +152,31 @@ if __name__ == '__main__':
                     "\t1 - Print the network\n" \
                     "\t2 - Simulate Node Failure\n" \
                     "\t3 - Simulate Link Failure\n" \
+                    "\t4 - Simulate Node Recovery\n" \
+                    "\t5 - Simulate Link Recovery\n" \
                     "====================================\n" 
                 x = raw_input("Command: ") 
                 print "====================================\n" 
                 input_cmd = int( x.strip().split()[0] )
 
-                if input_cmd is 0:
-                    
+                if input_cmd is 0:                    
                     print("Exiting program")
                     break        
-
                 elif input_cmd is 1:
-                    
-                    print_network(network)
-                    print
-                    print
+                    print_network(network, liveNodes)
+                    print('\n')
                 elif input_cmd is 2:
                     #TODO:
                     print('\nTODO: implement nodefail\n') 
-
                 elif input_cmd is 3:
                     #TODO:
                     print('\nTODO: implement linkfail\n') 
+                elif input_cmd is 4:
+                    #TODO:
+                    print('\nTODO: implement noderecovery\n') 
+                elif input_cmd is 5:
+                    #TODO:
+                    print('\nTODO: implement linkrecovery\n') 
 
     else:
         print("Exiting program")

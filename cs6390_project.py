@@ -1,6 +1,9 @@
 # python 2.7
 #
 # Node:  name, neighbors, and reachable paths
+#
+# Program can only acommodate 10 nodes (node0, node1, ..., node 9)
+#
 class Node:
     def __init__(self, name, neighbors):
         self._name = name
@@ -97,6 +100,48 @@ def best(path_y, path_w, neighbor):
         else:
             return path_y
 
+def print_live_nodes( liveNodes ):
+    print  "Live Nodes\n" 
+    output_str = ''
+    for idx, val in enumerate( liveNodes ):
+        output_str += 'Node {}: {}, '.format(idx,val)
+    print(output_str)
+
+def modify_node_liveness( liveNodes, fail_or_rec):
+    #
+    #   
+    #
+    num_nodes = len(liveNodes)
+    modified_nodes = [None]*num_nodes
+    for idx in range(num_nodes):
+        modified_nodes[idx] = liveNodes[idx]
+
+    x = raw_input("Nodes: ") 
+    print "====================================\n"
+    nodes = x.strip().split()
+    node_ints = []
+    for node in nodes:
+        n_int = ord( node )
+        #if undefined node specified, return False
+        if n_int < ord( '0' ) or n_int > ord( str( num_nodes - 1) ):
+            print('Invalid Node. Node values must be 0 through {}\n'.format(num_nodes-1))
+            return None
+        else:
+            node_ints.append( int(node) )
+
+    if fail_or_rec == 0: #make nodes fail
+        for node in node_ints:
+
+            modified_nodes[node] = False
+        
+
+    if fail_or_rec == 1: #make nodes recover
+        for node in node_ints:
+            modified_nodes[node] = True
+    
+    #if modification is successful return new Nodes
+    return modified_nodes
+
 
 # Print the network
 def print_network(network, liveNodes):
@@ -145,36 +190,60 @@ if __name__ == '__main__':
      
         if networkInit:
             while True:
-                print "====================================\n" \
+                print "======================================================\n" \
                     "\tInput a command\n" \
-                    "====================================\n" \
+                    "======================================================\n" \
                     "\t0 - Exit Program\n" \
                     "\t1 - Print the network\n" \
                     "\t2 - Simulate Node Failure\n" \
                     "\t3 - Simulate Link Failure\n" \
                     "\t4 - Simulate Node Recovery\n" \
                     "\t5 - Simulate Link Recovery\n" \
-                    "====================================\n" 
+                    "======================================================\n" 
                 x = raw_input("Command: ") 
-                print "====================================\n" 
+                print "======================================================\n" 
                 input_cmd = int( x.strip().split()[0] )
 
-                if input_cmd is 0:                    
+                if input_cmd is 0:   #0 - Exit Program             
                     print("Exiting program")
                     break        
-                elif input_cmd is 1:
+                elif input_cmd is 1:  #1 - Print the network
                     print_network(network, liveNodes)
                     print('\n')
-                elif input_cmd is 2:
-                    #TODO:
-                    print('\nTODO: implement nodefail\n') 
-                elif input_cmd is 3:
+                elif input_cmd is 2:  #2 - Simulate Node Failure
+                   
+                    print_live_nodes( liveNodes )
+
+                    print "======================================================\n" \
+                    "\tSpecify nodes to fail (separated by spaces)\n" \
+                    "======================================================\n" \
+                
+                    new_live_nodes = modify_node_liveness( liveNodes, 0)
+                    
+                    if new_live_nodes:
+                        liveNodes = new_live_nodes
+                        print_live_nodes( liveNodes )
+
+
+                elif input_cmd is 3: #3 - Simulate Link Failure
                     #TODO:
                     print('\nTODO: implement linkfail\n') 
-                elif input_cmd is 4:
-                    #TODO:
-                    print('\nTODO: implement noderecovery\n') 
-                elif input_cmd is 5:
+                elif input_cmd is 4: #4 - Simulate Node Recovery
+
+                    print_live_nodes( liveNodes )
+
+                    print "======================================================\n" \
+                    "\tSpecify nodes to recover (separated by spaces)\n" \
+                    "======================================================\n" \
+                
+                    new_live_nodes = modify_node_liveness( liveNodes, 1)
+                    
+
+                    if new_live_nodes:
+                        liveNodes = new_live_nodes
+                        print_live_nodes( liveNodes )
+
+                elif input_cmd is 5: #5 - Simulate Link Recovery
                     #TODO:
                     print('\nTODO: implement linkrecovery\n') 
 

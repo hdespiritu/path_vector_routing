@@ -109,7 +109,9 @@ def print_live_nodes( liveNodes ):
 
 def modify_node_liveness( liveNodes, fail_or_rec):
     #
-    #   
+    # liveNodes: list of booleans denoting if node at position idx is live
+    # fail_or_rec: if 0, then will set specified nodes to fail
+    #              if 1, then will set specified nodes to recover
     #
     num_nodes = len(liveNodes)
     modified_nodes = [None]*num_nodes
@@ -142,6 +144,54 @@ def modify_node_liveness( liveNodes, fail_or_rec):
     #if modification is successful return new Nodes
     return modified_nodes
 
+def modify_link_liveness( network, fail_or_rec ):
+    #
+    # network: list of Node objects that define the network
+    # fail_or_rec: if 0, then will set specified links to fail
+    #              if 1, then will set specified links to recover
+    #
+
+    x = raw_input("Links: ") 
+    print "====================================\n"
+    link_pair_strings = x.strip().split()
+    link_ints = [] # array of pairs [ [nodex1, nodex2], ..., [nodexk-1, nodexk]]
+    for link_pair_str in link_pair_strings:
+        link_pair = link_pair_str.split(",")
+        n_int1 = ord( link_pair[0] )
+        n_int2 = ord( link_pair[1] )
+        #if undefined node specified, return False
+        cond1 = n_int1 < ord( '0' ) or n_int1 > ord( str( num_nodes - 1) )
+        cond2 = n_int2 < ord( '0' ) or n_int2 > ord( str( num_nodes - 1) )
+        if cond1 or cond2:
+            print('Invalid Node. Node values must be 0 through {}\n'.format(num_nodes-1))
+            return False
+        else:
+            link_ints.append( [int( link_pair[0] ), int( link_pair[1] )] )
+
+
+    new_link_val = None
+    if fail_or_rec == 0: #make nodes fail
+        new_link_val = False
+    if fail_or_rec == 1: #make nodes recover
+        new_link_val = True
+
+    for link in link_ints:
+
+        node1 = link[0]
+        node2 = link[1]
+
+        #set link failure/recovery for node1
+        tmp = network[ node1 ].liveNeighbors
+        tmp[ str(node2) ] = new_link_val
+        network[ node1 ].liveNeighbors = tmp
+
+        #set link failure/recovery for node2
+        tmp = network[ node2 ].liveNeighbors
+        tmp[ str(node1) ] = new_link_val
+        network[ node2 ].liveNeighbors = tmp
+    
+    #if modification is successful return new Nodes
+    return True
 
 # Print the network
 def print_network(network, liveNodes):
@@ -226,8 +276,18 @@ if __name__ == '__main__':
 
 
                 elif input_cmd is 3: #3 - Simulate Link Failure
-                    #TODO:
-                    print('\nTODO: implement linkfail\n') 
+                    
+                    print_network( network, liveNodes )
+
+                    print "======================================================\n" \
+                    "\tSpecify links to fail (node comma pairs separated by spaces)\n\t eg 1,2 2,0\n" \
+                    "======================================================\n" \
+                
+                    new_network = modify_link_liveness( network, 0)
+                    
+                    if new_network:
+                        print_network( network, liveNodes )
+                    
                 elif input_cmd is 4: #4 - Simulate Node Recovery
 
                     print_live_nodes( liveNodes )
@@ -244,8 +304,17 @@ if __name__ == '__main__':
                         print_live_nodes( liveNodes )
 
                 elif input_cmd is 5: #5 - Simulate Link Recovery
-                    #TODO:
-                    print('\nTODO: implement linkrecovery\n') 
+                    
+                    print_network( network, liveNodes )
+
+                    print "======================================================\n" \
+                    "\tSpecify links to recover (node comma pairs separated by spaces)\n\t eg 1,2 2,0\n" \
+                    "======================================================\n" \
+                
+                    new_network = modify_link_liveness( network, 1)
+                    
+                    if new_network:
+                        print_network( network, liveNodes )
 
     else:
         print("Exiting program")

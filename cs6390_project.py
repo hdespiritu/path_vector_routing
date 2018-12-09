@@ -39,26 +39,32 @@ class Node:
     def liveNeighbors(self):
         return self._liveNeighbors
 
+    ''' Doesn't work for some reason
     @liveNeighbors.setter
     def liveNeighbors(self, value):
         neighbors, liveness = value
         assert len(neighbors) == len(liveness)
         for idx, elem in enumerate( neighbors ):
             self._liveNeighbors[elem] = liveness[ idx ]
-
+    '''
 
 
 # Initialize reachable paths for each node
-def initialization(num_nodes, node):
+def initialization(num_nodes, node, liveNodes):
+    node._paths = []
     for y in range(num_nodes):
         s = []
-        if node.name == y:
+        #check that node is live, if not we don't include a path to itself
+        if node.name == y and  liveNodes[y]: #node is a path to itself
             s.append(node.name)
             node.paths.append(s)
-        elif str(y) in node.neighbors:
-            s.append(node.name)
-            s.append(y)
-            node.paths.append(s)
+        #check that node is live, if not we don't include a path to its neighbors
+        elif liveNodes[node.name] and str(y) in node.neighbors:#node is a neighbor
+            #check that the neighbor node and neighbor link is live 
+            if liveNodes[y] and node.liveNeighbors[ str(y) ]:
+                s.append(node.name)
+                s.append(y)
+                node.paths.append(s)
         else:
             s.append("")
             node.paths.append(s)
@@ -223,19 +229,20 @@ if __name__ == '__main__':
 
         if (not networkInit):
             network = []  # Create network
+            liveNodes = [True]*num_nodes
+
             # Build the network
             for i in range(num_nodes):
                 s = raw_input("Input neighbors of node number {} (separated by spaces): ".format(i)) 
                 s_arr = s.strip().split(" ")
                 network.append(Node(i, s_arr))  # Add nodes to the network
-                initialization(num_nodes, network[i])  # Initializing reachable paths for each node of the network
+                initialization(num_nodes, network[i], liveNodes)  # Initializing reachable paths for each node of the network
             # Update paths in the network
             for item in network:
                     for i in item.neighbors:
                         network = update(item, network[int(i)], network)
 
             networkInit = True
-            liveNodes = [True]*num_nodes
             print("Network Initialized\n\n")
      
         if networkInit:
@@ -249,6 +256,7 @@ if __name__ == '__main__':
                     "\t3 - Simulate Link Failure\n" \
                     "\t4 - Simulate Node Recovery\n" \
                     "\t5 - Simulate Link Recovery\n" \
+                    "\t6 - Re-compute Node Paths\n" \
                     "======================================================\n" 
                 x = raw_input("Command: ") 
                 print "======================================================\n" 
@@ -316,6 +324,21 @@ if __name__ == '__main__':
                     if new_network:
                         print_network( network, liveNodes )
 
+                elif input_cmd is 6: #6 - Re-compute node paths
+                    
+                    
+                    num_nodes = len( network )
+                    # Initialization checks if node and its links are reachable???
+                    for i in range( num_nodes ):
+                        initialization(num_nodes, network[i], liveNodes)  # Initializing reachable paths for each node of the network
+
+                    #DEBUGGING
+                    continue 
+                        
+                    # Update paths in the network
+                    for item in network:
+                            for i in item.neighbors:
+                                network = update(item, network[int(i)], network)
     else:
         print("Exiting program")
         pass  

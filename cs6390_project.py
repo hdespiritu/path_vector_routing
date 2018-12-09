@@ -65,6 +65,9 @@ def initialization(num_nodes, node, liveNodes):
                 s.append(node.name)
                 s.append(y)
                 node.paths.append(s)
+            else:
+                s.append("")
+                node.paths.append(s)
         else:
             s.append("")
             node.paths.append(s)
